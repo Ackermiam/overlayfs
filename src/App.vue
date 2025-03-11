@@ -18,10 +18,10 @@
         </div>
       </div>
     </div>
-    <img src="/fsoverlay/chevalier.png" class="chevalier"/>
+    <img src="/overlayfs/chevalier.png" class="chevalier"/>
     <div class="epeeContainer">
-      <img src="/fsoverlay/epees.png" class="epee epeeUn"/>
-      <img src="/fsoverlay/epees.png" class="epee epeeDeux"/>
+      <img src="/overlayfs/epees.png" class="epee epeeUn"/>
+      <img src="/overlayfs/epees.png" class="epee epeeDeux"/>
     </div>
   </div>
 </template>
