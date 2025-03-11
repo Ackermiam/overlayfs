@@ -1,47 +1,64 @@
 <template>
   <div>
-    <div
-      class="dark-souls-container"
-      @click="validateBoss($event)"
-      @contextmenu.prevent="invalidateLastBoss($event)"
-    >
+    <div class="dark-souls-container">
       <h1>Bosses</h1>
-      <div class="boss-list">
+      <div class="boss-list" ref="bossList">
         <div
           v-for="(boss, index) in bosses"
           :key="index"
           class="boss"
           :class="{ validated: index <= validatedIndex }"
+          style="margin-right: 20px"
         >
           {{ boss }}
           <div v-if="index < bosses.length - 1" class="separator"></div>
         </div>
       </div>
     </div>
-    <img src="/overlayfs/chevalier.png" class="chevalier"/>
+    <img src="/chevalier.png" class="chevalier" />
     <div class="epeeContainer">
-      <img src="/overlayfs/epees.png" class="epee epeeUn"/>
-      <img src="/overlayfs/epees.png" class="epee epeeDeux"/>
+      <img src="/epees.png" class="epee epeeUn" />
+      <img src="/epees.png" class="epee epeeDeux" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted, onMounted } from "vue";
+import { ref, onMounted, onUnmounted, nextTick } from "vue";
 
 const bosses = ref([
-  "Abyss Watchers",
-  "Pontiff Sulyvahn",
-  "Nameless King",
-  "Sister Friede",
-  "Slave Knight Gael",
+  "Iudex Gundyr",
+  "Vordt",
+  "Abys watcher",
+  "Wolnir",
+  "Crystal sage",
+  "Diacres",
+  "Pontiff sulhyvan",
+  "Aldrich",
+  "Danseuse boréale",
+  "Dragon slayer armor",
+  "Lotric princes",
+  "Chevalier des cendres",
 ]);
 
-let validatedIndex = ref(-1);
+const validatedIndex = ref(-1);
+const bossList = ref(null);
 
-const validateBoss = (event) => {
+const channel = new BroadcastChannel("boss_channel");
+
+const validateBoss = () => {
   if (validatedIndex.value < bosses.value.length - 1) {
     validatedIndex.value++;
+    channel.postMessage(validatedIndex.value);
+
+    nextTick(() => {
+      if (bossList.value) {
+        bossList.value.scrollTo({
+          top: bossList.value.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    });
   }
 };
 
@@ -49,7 +66,12 @@ const invalidateLastBoss = (event) => {
   event.preventDefault();
   if (validatedIndex.value >= 0) {
     validatedIndex.value--;
+    channel.postMessage(validatedIndex.value);
   }
+};
+
+channel.onmessage = (event) => {
+  validatedIndex.value = event.data;
 };
 
 onMounted(() => {
@@ -69,19 +91,35 @@ onUnmounted(() => {
   top: 200px;
   right: 20px;
   padding: 10px 30px 70px 30px;
-  background-color: #333333d7;
+  background-color: #3333337a;
   color: white;
   border: 2px solid #572e0c;
   border-radius: 8px;
 }
 
 h1 {
-  font-family: 'shadow';
+  font-family: "shadow";
   font-size: 2.5em;
+  color: #ffd5a2;
+  text-align: center;
 }
 
 .boss-list {
-  pointer-events: none;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.boss-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.boss-list::-webkit-scrollbar-thumb {
+  background-color: #815d31;
+  border-radius: 4px;
+}
+
+.boss-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .boss {
@@ -90,13 +128,15 @@ h1 {
 
 .validated {
   text-decoration: line-through;
+  text-decoration-color: rgb(0, 255, 0);
+  text-decoration-thickness: 4px;
   opacity: 0.5;
 }
 
 .separator {
   height: 1px;
   width: 100%;
-  background-color: rgba(146, 146, 146, 0.322);
+  background-color: rgba(104, 104, 104, 0.596);
   margin-top: 10px;
 }
 
@@ -105,7 +145,7 @@ h1 {
   height: auto;
   position: fixed;
   top: 90px;
-  right: 25px;
+  right: 55px;
 }
 
 .epeeContainer {
@@ -118,13 +158,13 @@ h1 {
   width: 250px;
   height: auto;
   position: fixed;
-  top: 560px;
-  right: -10px;
+  top: 610px;
+  right: 10px;
 }
 
 .epeeUn {
-transform: rotateZ(-20deg);
-animation: rotateFirstSword 5s infinite;
+  transform: rotateZ(-20deg);
+  animation: rotateFirstSword 5s infinite;
 }
 
 .epeeDeux {
@@ -143,7 +183,7 @@ animation: rotateFirstSword 5s infinite;
     transform: rotateZ(-30deg);
   }
   100% {
-transform: rotateZ(-20deg);
+    transform: rotateZ(-20deg);
   }
 }
 @keyframes rotateSecondSword {
